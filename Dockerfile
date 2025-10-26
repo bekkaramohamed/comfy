@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM runpod/worker-comfyui:5.1.0-base
+FROM runpod/worker-comfyui:5.5.0-base
 
 # =======================================================
 # ⚙️ Dépendances système
@@ -62,6 +62,7 @@ RUN pip install --no-cache-dir pillow numpy opencv-python-headless
 # =======================================================
 RUN echo "✅ Installed custom nodes:" && ls -1 /comfyui/custom_nodes && \
     echo "✅ Symlinked model directory:" && ls -l /comfyui/models
+
 
 
 
