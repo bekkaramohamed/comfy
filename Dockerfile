@@ -1,52 +1,62 @@
-# ======================================================
-# 🐳 Base officielle RunPod ComfyUI (contient déjà .venv et worker)
-# ======================================================
-FROM runpod/worker-comfyui:5.5.0-base
+# syntax=docker/dockerfile:1.4
+FROM runpod/worker-comfyui:5.1.0-base
 
-# ======================================================
-# ⚙️ 1️⃣ Nettoyage de l'ancienne version de Torch
-# ======================================================
-RUN yes | /workspace/runpod-slim/ComfyUI/.venv/bin/python -m uv pip uninstall \
-      torch torchvision torchaudio triton && \
-    rm -rf /root/.cache/uv /root/.cache/pip /root/.cache/torch_extensions /tmp/pip-*
+# =======================================================
+# ⚙️ Dépendances système
+# =======================================================
+RUN apt-get update && apt-get install -y --no-install-recommends git curl && rm -rf /var/lib/apt/lists/*
 
-# ======================================================
-# ⚙️ 2️⃣ Réinstallation de PyTorch 2.9 + CUDA 12.8
-# ======================================================
-RUN /workspace/runpod-slim/ComfyUI/.venv/bin/python -m uv pip install \
-      torch==2.9.0+cu128 \
-      torchvision==0.24.0+cu128 \
-      torchaudio==2.9.0+cu128 \
-      triton==3.5.0 \
-      --extra-index-url https://download.pytorch.org/whl/cu128 && \
-    /workspace/runpod-slim/ComfyUI/.venv/bin/python -m uv pip install numpy==1.26.4
+# =======================================================
+# 🔗 Préparation des liens symboliques pour RunPod
+# =======================================================
+# /workspace -> /runpod-volume
+# /comfyui/models -> /runpod-volume/models
+RUN mkdir -p /runpod-volume/models && \
+    rm -rf /workspace && ln -s /runpod-volume /workspace && \
+    rm -rf /comfyui/models && ln -s /runpod-volume/models /comfyui/models && \
+    echo "🔗 Symlinks created:" && \
+    ls -l / | grep runpod-volume && ls -l /comfyui | grep models
 
-# ======================================================
-# ⚙️ 3️⃣ Installation des dépendances custom
-# ======================================================
-RUN /workspace/runpod-slim/ComfyUI/.venv/bin/python -m pip install sageattention && \
-    /workspace/runpod-slim/ComfyUI/.venv/bin/python -m uv pip install \
-      git+https://github.com/nunchaku-tech/nunchaku.git@v1.0.0 \
-      --no-binary nunchaku \
-      --reinstall \
-      --no-cache
+# =======================================================
+# 🔍 Torch + CUDA Check
+# =======================================================
+RUN echo "🧠 Checking Torch and CUDA version..." && \
+    python3 -c "import torch; print(f'Torch version: {torch.__version__}, CUDA: {torch.version.cuda}')"
 
-# ======================================================
-# ⚙️ 4️⃣ Variables d’environnement GPU
-# ======================================================
-ENV TORCH_CUDA_ARCH_LIST="8.9"
-ENV FORCE_CMAKE=1
-ENV MAX_JOBS=$(nproc)
-ENV USE_TORCH_VERSION=2.9.0
-ENV UV_LINK_MODE=copy
+# =======================================================
+# ⚙️ Installation de Nunchaku
+# =======================================================
+RUN echo "📦 Installing Nunchaku wheel..." && \
+    pip install --no-cache-dir \
+      'https://github.com/nunchaku-tech/nunchaku/releases/download/v1.0.0/nunchaku-1.0.0+torch2.6-cp312-cp312-linux_x86_64.whl'
 
-# ======================================================
-# 📁 5️⃣ Point de montage de ton volume ComfyUI
-# ======================================================
-RUN mkdir -p /workspace
-WORKDIR /workspace
+# =======================================================
+# 🧩 Installation des nodes depuis le registry
+# =======================================================
+RUN echo "🧩 Installing registry-based custom nodes..." && \
+    comfy-node-install \
+      rgthree-comfy \
+      ComfyUI-nunchaku \
+      ComfyUI-WanVideoWrapper || true
 
-# ======================================================
-# 🚀 6️⃣ Commande de démarrage par défaut
-# ======================================================
-CMD ["python3", "/workspace/runpod-slim/ComfyUI/main.py"]
+# =======================================================
+# 🧠 Clonage manuel des nodes non présents dans le registry
+# =======================================================
+RUN echo "📦 Cloning manual custom nodes..." && \
+    cd /comfyui/custom_nodes && \
+    git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
+    git clone --depth 1 https://github.com/shiimizu/ComfyUI-TiledDiffusion.git && \
+    rm -rf /comfyui/custom_nodes/*/.git && \
+    echo "📥 Installing deps for manually cloned nodes..." && \
+    for d in /comfyui/custom_nodes/*; do \
+      if [ -f "$d/requirements.txt" ]; then \
+        echo "📦 Installing deps for $d..." && pip install -r "$d/requirements.txt" || true; \
+      fi; \
+    done
+
+# =======================================================
+# ✅ Vérifications finales
+# =======================================================
+RUN echo "✅ Installed custom nodes:" && ls -1 /comfyui/custom_nodes && \
+    echo "✅ Symlinked model directory:" && ls -l /comfyui/models
