@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git curl && rm 
 RUN mkdir -p /runpod-volume/models && \
     rm -rf /workspace && ln -s /runpod-volume /workspace && \
     rm -rf /comfyui/models && ln -s /runpod-volume/models /comfyui/models && \
-    echo "🔗 Symlinks created:" && \
+    echo "🔗 Symlinks created successfully:" && \
     ls -l / | grep runpod-volume && ls -l /comfyui | grep models
 
 
@@ -61,4 +61,5 @@ RUN echo "📦 Cloning manual custom nodes..." && \
 # =======================================================
 RUN echo "✅ Installed custom nodes:" && ls -1 /comfyui/custom_nodes && \
     echo "✅ Symlinked model directory:" && ls -l /comfyui/models
+
 
