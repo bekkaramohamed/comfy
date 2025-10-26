@@ -32,15 +32,6 @@ RUN echo "📦 Installing Nunchaku 1.0.1 (Torch 2.7, cp312)..." && \
       'https://github.com/nunchaku-tech/nunchaku/releases/download/v1.0.1/nunchaku-1.0.1+torch2.7-cp312-cp312-linux_x86_64.whl'
 
 # =======================================================
-# 🧩 Installation des nodes depuis le registry
-# =======================================================
-RUN echo "🧩 Installing registry-based custom nodes..." && \
-    comfy-node-install \
-      rgthree-comfy \
-      ComfyUI-nunchaku \
-      ComfyUI-WanVideoWrapper || true
-
-# =======================================================
 # 🧠 Clonage manuel des nodes non présents dans le registry
 # =======================================================
 RUN echo "📦 Cloning manual custom nodes..." && \
@@ -50,6 +41,9 @@ RUN echo "📦 Cloning manual custom nodes..." && \
     git clone --depth 1 https://github.com/shiimizu/ComfyUI-TiledDiffusion.git && \
     git clone --depth 1 https://github.com/gseth/ControlAltAI-Nodes.git && \
     git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials.git && \
+    git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git && \
+    git clone --depth 1 https://github.com/nunchaku-tech/ComfyUI-nunchaku.git && \
+    git clone --depth 1 https://github.com/kijai/ComfyUI-WanVideoWrapper.git && \
     rm -rf /comfyui/custom_nodes/*/.git && \
     echo "📥 Installing deps for manually cloned nodes..." && \
     for d in /comfyui/custom_nodes/*; do \
@@ -68,5 +62,6 @@ RUN pip install --no-cache-dir pillow numpy opencv-python-headless
 # =======================================================
 RUN echo "✅ Installed custom nodes:" && ls -1 /comfyui/custom_nodes && \
     echo "✅ Symlinked model directory:" && ls -l /comfyui/models
+
 
 
