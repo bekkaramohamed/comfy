@@ -10,12 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends git curl && rm 
 # 🔗 Préparation des liens symboliques pour RunPod
 # =======================================================
 # /workspace -> /runpod-volume
-# /ComfyUI/models -> /runpod-volume/models
+# /comfyui/models -> /runpod-volume/models
 RUN mkdir -p /runpod-volume/models && \
     rm -rf /workspace && ln -s /runpod-volume /workspace && \
-    rm -rf /ComfyUI/models && ln -s /runpod-volume/models /ComfyUI/models && \
+    rm -rf /comfyui/models && ln -s /runpod-volume/models /comfyui/models && \
     echo "🔗 Symlinks created:" && \
-    ls -l / | grep runpod-volume && ls -l /ComfyUI | grep models
+    ls -l / | grep runpod-volume && ls -l /comfyui | grep models
+
 
 # =======================================================
 # 🔍 Torch + CUDA Check
