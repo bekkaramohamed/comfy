@@ -47,6 +47,7 @@ RUN echo "📦 Cloning manual custom nodes..." && \
     git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials.git && \
     git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git && \
     git clone --depth 1 https://github.com/nunchaku-tech/ComfyUI-nunchaku.git && \
+    git clone --depth 1 https://github.com/kijai/ComfyUI-MelBandRoFormer && \
     git clone --depth 1 https://github.com/kijai/ComfyUI-WanVideoWrapper.git && \
     rm -rf /comfyui/custom_nodes/*/.git && \
     echo "📥 Installing deps for manually cloned nodes..." && \
@@ -59,7 +60,7 @@ RUN echo "📦 Cloning manual custom nodes..." && \
 # =======================================================
 # 🧩 Dépendances Python manquantes (sécurité)
 # =======================================================
-RUN pip install --no-cache-dir pillow numpy opencv-python-headless
+RUN pip install --no-cache-dir pillow numpy sageattention opencv-python-headless
 
 
 COPY handler.py /handler.py
@@ -69,6 +70,7 @@ COPY handler.py /handler.py
 # =======================================================
 RUN echo "✅ Installed custom nodes:" && ls -1 /comfyui/custom_nodes && \
     echo "✅ Symlinked model directory:" && ls -l /comfyui/models
+
 
 
 
