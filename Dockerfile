@@ -26,6 +26,10 @@ RUN echo "🧠 Checking Torch and CUDA version..." && \
 
 # =======================================================
 # ⚙️ Installation de Nunchaku (v1.0.1 compatible Torch 2.7 + Python 3.12)
+# La wheel est compilée avec torch 2.9 , alors que l'image de workfer-comfyui 5.5.0-base utiliser torch 2.7
+# Certaines des fonctionnalités liées aux modèles QWEN et d'autres ne marcheront pas, mais pour nos workflows (Wan2.1, infinite talk), ce n'est pas gênants
+# Il y aura des erreurs d'imports au runtime liées aux raisons citées au dessus
+
 # =======================================================
 RUN echo "📦 Installing Nunchaku 1.0.1 (Torch 2.7, cp312)..." && \
     pip install --no-cache-dir \
@@ -65,6 +69,7 @@ COPY handler.py /handler.py
 # =======================================================
 RUN echo "✅ Installed custom nodes:" && ls -1 /comfyui/custom_nodes && \
     echo "✅ Symlinked model directory:" && ls -l /comfyui/models
+
 
 
 
