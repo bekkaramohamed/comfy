@@ -29,7 +29,7 @@ RUN echo "🧠 Checking Torch and CUDA version..." && \
 # =======================================================
 RUN echo "📦 Installing Nunchaku 1.0.1 (Torch 2.7, cp312)..." && \
     pip install --no-cache-dir \
-      'https://github.com/nunchaku-tech/nunchaku/releases/download/v1.0.1/nunchaku-1.0.1+torch2.7-cp312-cp312-linux_x86_64.whl'
+      'https://github.com/nunchaku-tech/nunchaku/releases/download/v1.0.0/nunchaku-1.0.0+torch2.7-cp312-cp312-linux_x86_64.whl'
 
 # =======================================================
 # 🧠 Clonage manuel des nodes non présents dans le registry
@@ -65,6 +65,7 @@ COPY handler.py /handler.py
 # =======================================================
 RUN echo "✅ Installed custom nodes:" && ls -1 /comfyui/custom_nodes && \
     echo "✅ Symlinked model directory:" && ls -l /comfyui/models
+
 
 
 
