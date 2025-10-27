@@ -788,21 +788,20 @@ def handler(job):
             ws.close()
 
     final_result = {}
-
     output_dir = "/comfyui/output"
-      if os.path.exists(output_dir):
-          for filename in os.listdir(output_dir):
-              if filename.startswith("_"):
-                  continue
-              filepath = os.path.join(output_dir, filename)
-              if os.path.isfile(filepath):
-                  try:
-                      with open(filepath, "rb") as f:
-                          output_data.append({"filename": filename, "type": "base64", "data": base64.b64encode(f.read()).decode()})
-                      os.remove(filepath)
-                      print(f"worker-comfyui - Encoded and deleted: {filename}")
-                  except Exception as e:
-                      print(f"worker-comfyui - Error processing {filename}: {e}")
+    if os.path.exists(output_dir):
+        for filename in os.listdir(output_dir):
+            if filename.startswith("_"):
+                continue
+            filepath = os.path.join(output_dir, filename)
+            if os.path.isfile(filepath):
+                try:
+                    with open(filepath, "rb") as f:
+                        output_data.append({"filename": filename, "type": "base64", "data": base64.b64encode(f.read()).decode()})
+                    os.remove(filepath)
+                    print(f"worker-comfyui - Encoded and deleted: {filename}")
+                except Exception as e:
+                    print(f"worker-comfyui - Error processing {filename}: {e}")
 
     if output_data:
         final_result["images"] = output_data
