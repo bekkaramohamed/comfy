@@ -57,11 +57,15 @@ RUN echo "📦 Cloning manual custom nodes..." && \
 # =======================================================
 RUN pip install --no-cache-dir pillow numpy opencv-python-headless
 
+
+COPY handler.py /handler.py
+
 # =======================================================
 # ✅ Vérifications finales
 # =======================================================
 RUN echo "✅ Installed custom nodes:" && ls -1 /comfyui/custom_nodes && \
     echo "✅ Symlinked model directory:" && ls -l /comfyui/models
+
 
 
 
